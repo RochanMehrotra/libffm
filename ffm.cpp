@@ -639,8 +639,7 @@ ffm_model ffm_train_on_disk(string tr_path, string va_path, ffm_parameter param)
 }
 
 void ffm_save_model(ffm_model &model, string path) {
-	cout<<path+""<<"\n";
-    ofstream f_out(path, ios::out | ios::binary);
+	ofstream f_out(path, ios::out | ios::binary);
     f_out.write(reinterpret_cast<char*>(&model.n), sizeof(ffm_int));
     f_out.write(reinterpret_cast<char*>(&model.m), sizeof(ffm_int));
     f_out.write(reinterpret_cast<char*>(&model.k), sizeof(ffm_int));
