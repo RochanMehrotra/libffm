@@ -71,6 +71,7 @@ ffm_long get_w_size(ffm_model &model) {
 }
 
 #if defined USESSE
+
 inline ffm_float wTx(
     ffm_node *begin,
     ffm_node *end,
@@ -172,7 +173,6 @@ inline ffm_float wTx(
     XMMt = _mm_hadd_ps(XMMt, XMMt);
     ffm_float t;
     _mm_store_ss(&t, XMMt);
-
     return t;
 }
 
@@ -231,7 +231,6 @@ inline ffm_float wTx(
             }
         }
     }
-
     return t;
 }
 #endif
@@ -640,6 +639,7 @@ ffm_model ffm_train_on_disk(string tr_path, string va_path, ffm_parameter param)
 }
 
 void ffm_save_model(ffm_model &model, string path) {
+	cout<<path+""<<"\n";
     ofstream f_out(path, ios::out | ios::binary);
     f_out.write(reinterpret_cast<char*>(&model.n), sizeof(ffm_int));
     f_out.write(reinterpret_cast<char*>(&model.m), sizeof(ffm_int));
@@ -656,6 +656,15 @@ void ffm_save_model(ffm_model &model, string path) {
         f_out.write(reinterpret_cast<char*>(model.W+offset), sizeof(ffm_float) * size);
         offset = next_offset;
     }
+    fstream file;
+    file.open(path+"_java.txt",fstream::out);
+    file<<model.n<<","<<model.m<<","<<model.k<<","<<model.normalization<<"\n";
+    ffm_long Wsize=model.n*model.m*get_k_aligned(model.k)*2;
+    for(ffm_long x=0;x<=Wsize;x++){
+        file<<model.W[x]<<"\n";
+
+    }
+    file.close();
 }
 
 ffm_model ffm_load_model(string path) {
@@ -678,19 +687,21 @@ ffm_model ffm_load_model(string path) {
         f_in.read(reinterpret_cast<char*>(model.W+offset), sizeof(ffm_float) * size);
         offset = next_offset;
     }
-
+    
     return model;
 }
 
 ffm_float ffm_predict(ffm_node *begin, ffm_node *end, ffm_model &model) {
+    
     ffm_float r = 1;
     if(model.normalization) {
         r = 0;
-        for(ffm_node *N = begin; N != end; N++)
-            r += N->v*N->v; 
+        for(ffm_node *N = begin; N != end; N++){
+        	r += N->v*N->v; 
+        }
         r = 1/r;
     }
-
+    
     ffm_float t = wTx(begin, end, r, model);
 
     return 1/(1+exp(-t));

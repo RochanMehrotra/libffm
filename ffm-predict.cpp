@@ -9,11 +9,11 @@
 #include <vector>
 #include <cstdlib>
 
+
 #include "ffm.h"
 
 using namespace std;
 using namespace ffm;
-
 struct Option {
     string test_path, model_path, output_path;
 };
@@ -100,6 +100,6 @@ int main(int argc, char **argv) {
     }
 
     predict(option.test_path, option.model_path, option.output_path);
-
+    
     return 0;
 }
