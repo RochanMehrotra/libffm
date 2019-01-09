@@ -34,7 +34,6 @@ public class Predict {
 
             }
             loss/=num_rows;
-            System.out.println(num_rows);
             System.out.println("loss"+loss);
 
         } catch (Exception e) {

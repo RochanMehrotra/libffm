@@ -1,7 +1,5 @@
 package libffm;
 
-import java.util.ArrayList;
-
 public class Ffm_model {
 
     int n; // number of features

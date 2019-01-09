@@ -1,33 +1,42 @@
 package libffm;
 
-import com.sun.deploy.util.ArrayUtil;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.io.*;
+
 
 import static libffm.Ffm.get_k_aligned;
 
 public class Load_model {
     public static Ffm_model ffm_load_model(String path) {
-
-        String data = "";
-        try {
-            data = new String(Files.readAllBytes(Paths.get(path)));
-        } catch (IOException e) {
+        int n=0;
+        int m=0;
+        int k=0;
+        boolean norm=false;
+        float[] weights=new float[0];
+        try(InputStream inputstream = new FileInputStream(path);
+            BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(inputstream)))
+        {
+            String[] firstLine;
+            firstLine = bufferedReader.readLine().split(",");
+            n=Integer.parseInt(firstLine[0]);
+            m=Integer.parseInt(firstLine[1]);
+            k=Integer.parseInt(firstLine[2]);
+            norm=firstLine[3].equals("1") ? true : false;
+            int x=0;
+            weights=new float[n*m*get_k_aligned(k)*2+1];
+            String l;
+            while( (l = bufferedReader.readLine()) != null ){
+                weights[x]=Float.parseFloat(l);
+                x++;
+            }
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        String[] splited = data.split("\n");
-        String[] nmkN = splited[0].split(",");
-        float[] weights=new float[splited.length];
-        for (int s = 1; s < splited.length; s++) {
-            weights[s-1]=Float.parseFloat(splited[s]);
+        catch (IOException e) {
+            e.printStackTrace();
         }
 
-        boolean norm = nmkN[3].equals("1") ? true : false;
-        Ffm_model model = new Ffm_model(Integer.parseInt(nmkN[0]), Integer.parseInt(nmkN[1]), Integer.parseInt(nmkN[2]),
-                weights, norm);
+        Ffm_model model = new Ffm_model(n, m, k, weights, norm);
 
         return model;
     }
